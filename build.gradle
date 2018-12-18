@@ -1,0 +1,80 @@
+plugins {
+    id 'scala'
+    id 'java'
+}
+
+group 'com.example'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = JavaVersion.VERSION_1_10
+
+// Scala
+def scalaVersion = '2.11.12'
+def typeSafeConfig = '1.3.3'
+def scalaLogging = '3.9.0'
+def logbackVersion = '1.2.3'
+def log4jOverSlf4jVersion = '1.7.25'
+
+// Database
+def slickVersion = '3.2.3'
+def mariaDBJdbcVersion = '2.3.0'
+def postgresJdbcVersion = '42.2.5'
+def mysqlJdbcVersion = '8.0.13'
+def h2Version = '1.4.197'
+
+// Util
+def yodaTimeVersion = '2.10'
+
+// Test
+def junitVersion = '4.12'
+
+repositories {
+    mavenCentral()
+}
+
+// Common
+dependencies {
+    compile group: 'org.scala-lang', name: 'scala-library', version: scalaVersion
+    compile group: 'com.typesafe', name: 'config', version: typeSafeConfig
+    compile group: 'com.typesafe.scala-logging', name: 'scala-logging_2.11', version: scalaLogging
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
+    compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: log4jOverSlf4jVersion
+}
+
+// Database
+dependencies {
+    compile group: 'com.typesafe.slick', name: 'slick_2.11', version: slickVersion
+    compile group: 'com.typesafe.slick', name: 'slick-hikaricp_2.11', version: slickVersion
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: mariaDBJdbcVersion
+    compile group: 'mysql', name: 'mysql-connector-java', version: mysqlJdbcVersion
+    compile group: 'org.postgresql', name: 'postgresql', version: postgresJdbcVersion
+}
+
+// Util
+dependencies {
+    compile group: 'joda-time', name: 'joda-time', version: yodaTimeVersion
+}
+
+// Test
+dependencies {
+    compile 'org.scala-lang:scala-library:2.11.12'
+    testCompile group: 'com.typesafe.slick', name: 'slick-testkit_2.11', version: slickVersion
+    testCompile group: 'junit', name: 'junit', version: junitVersion
+    testCompile group: 'com.h2database', name: 'h2', version: h2Version
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "com.pe.apps.Application"
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+task(runExample, dependsOn: 'classes', type: JavaExec) {
+    main = 'com.pe.apps.Application'
+    classpath = sourceSets.main.runtimeClasspath
+    args 4
+}
